@@ -5,6 +5,12 @@
         "paths": {
             "c/accountDisplay": [
                 "accountDisplay/accountDisplay.js"
+            ],
+            "c/accountForm": [
+                "accountForm/accountForm.js"
+            ],
+            "c/accountForm": [
+                "accountActionsAndInfo/accountActionsAndInfo.js"
             ]
         }
     },

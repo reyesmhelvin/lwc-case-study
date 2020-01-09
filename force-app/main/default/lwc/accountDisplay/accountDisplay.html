@@ -1,3 +1,17 @@
 <template>
-    <p>hi!</p>
+    <p>{accountId}</p>
+    <lightning-card
+        title="Accounts"
+        icon-name="standard:account"
+    >
+    <div style="height: 300px;">
+        <lightning-datatable
+                key-field="id"
+                data={accounts}
+                columns={columns}
+                onrowaction={handleRowAction}>
+        </lightning-datatable>
+    </div>
+    <c-account-actions-and-info onsaveaccounts={iterateOverTable}></c-account-actions-and-info>
+    </lightning-card>
 </template>

@@ -1,0 +1,31 @@
+<template>
+    <lightning-card
+        title="Account Editor"
+        icon-name="standard:account"
+    >
+        <div class="slds-m-around_medium">
+            <lightning-record-edit-form object-api-name="Account" onsubmit={handleSubmit}>
+                <lightning-messages>
+                </lightning-messages>
+                <lightning-input-field field-name="Name">
+                </lightning-input-field>
+                <lightning-input-field field-name="Type">
+                </lightning-input-field>
+                <lightning-input-field field-name="Industry">
+                </lightning-input-field>
+                    <lightning-button
+                        class="slds-m-top_small"
+                        type="submit"
+                        label="Save Draft"
+                        variant="brand">
+                    </lightning-button>
+                    <lightning-button
+                        class="slds-m-top_small"
+                        type="submit"
+                        label="Clear Form">
+                    </lightning-button>
+                   
+            </lightning-record-edit-form>
+        </div>
+    </lightning-card>
+</template>
