@@ -6,12 +6,14 @@
     >
     <div style="height: 300px;">
         <lightning-datatable
-                key-field="id"
+                key-field="Id"
                 data={accounts}
                 columns={columns}
-                onrowaction={handleRowAction}>
+                onrowaction={handleRowAction}
+                selected-rows={x}>
         </lightning-datatable>
     </div>
     <c-account-actions-and-info onsaveaccounts={iterateOverTable}></c-account-actions-and-info>
     </lightning-card>
 </template>
+    

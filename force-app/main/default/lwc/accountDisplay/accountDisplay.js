@@ -1,5 +1,4 @@
 import { LightningElement, track, wire } from 'lwc';
-import fetchDataHelper from './fetchDataHelper';
 import getAccountList from '@salesforce/apex/AccountController.getAccountList';
 import { CurrentPageReference } from 'lightning/navigation';
 //import findContacts from '@salesforce/apex/ContactController.findContacts';
@@ -11,10 +10,10 @@ import NAME_FIELD from '@salesforce/schema/Account.Name';
 import TYPE_FIELD from '@salesforce/schema/Account.Type';
 import INDUSTRY_FIELD from '@salesforce/schema/Account.Industry';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { reduceErrors } from './utils';
+import { reduceErrors, uuidv4 } from './utils';
 
 const actions = [
-    { label: 'Show details', name: 'show_details' },
+    { label: 'Edit', name: 'edit' },
     { label: 'Delete', name: 'delete' },
 ];
 
@@ -33,7 +32,10 @@ export default class AccountDisplay extends LightningElement {
     @track accounts = [];
     @track columns = columns;
     @track record = {};
+    @track x=[];
 
+
+    accountRecords = []; 
     name = ''
     type = ''
     industry = ''
@@ -48,8 +50,8 @@ export default class AccountDisplay extends LightningElement {
     }) {
         if (data) {
             this.accounts = [...data];
-            console.log(data);
-            console.log(JSON.stringify(data, null, '\t'));
+            //console.log(data);
+            //console.log(JSON.stringify(data, null, '\t'));
         } else if (error) {
             this.error = error;
         }
@@ -69,25 +71,38 @@ export default class AccountDisplay extends LightningElement {
     }
 
     handleDataSubmit(dataSubmit) {
-        console.log('nadidinig', dataSubmit);
         let parsedDataSubmit = JSON.parse(dataSubmit);
         //dataSubmitWithId.Id = '123';
         let newDataSubmit = [...this.accounts];
-        newDataSubmit.push(parsedDataSubmit);
+        parsedDataSubmit.uid = uuidv4();
+        newDataSubmit.unshift(parsedDataSubmit);
         this.accounts = [...newDataSubmit];
-        console.log('nadagdag ba?', JSON.stringify(this.accounts));
     }
     
     handleSaveAccounts() {
-        console.log('mama nakausap din kita!');
+        this.accountRecords = [];
         this.iterateOverTable();
+        
+    }
 
+    addUrlToAccountRecord(uid) {
+        return this.accounts.map((e) => {
+            console.log('e',e.uid);
+            if (e.uid === uid) {
+                e.id = this.accountId;
+                console.log(e.id);
+            };
+        });
+    }
+
+    createAccounts(record) {
         const fields = {};
-        fields[NAME_FIELD.fieldApiName] = this.name;
-        fields[TYPE_FIELD.fieldApiName] = this.type;
-        fields[INDUSTRY_FIELD.fieldApiName] = this.industry;
+        fields[NAME_FIELD.fieldApiName] = record.Name;
+        fields[TYPE_FIELD.fieldApiName] = record.Type;
+        fields[INDUSTRY_FIELD.fieldApiName] = record.Industry;
 
         const recordInput = { apiName: ACCOUNT_OBJECT.objectApiName, fields };
+
         createRecord(recordInput)
             .then(account => {
                 this.accountId = account.id;
@@ -98,6 +113,7 @@ export default class AccountDisplay extends LightningElement {
                         variant: 'success'
                     })
                 );
+                
             })
             .catch(error => {
                 this.dispatchEvent(
@@ -110,11 +126,12 @@ export default class AccountDisplay extends LightningElement {
             });
     }
 
-    iterateOverTable(event){        
+    iterateOverTable(event){       
         let table = this.template.querySelector('lightning-datatable');
         let rows = table.getSelectedRows();
-        rows.forEach( element => console.log('data table elements',JSON.stringify(element)));
-
+        let stringifedRows = JSON.stringify(rows);
+        this.accountRecords = [...JSON.parse(stringifedRows)];
+        this.accountRecords.forEach(rec => this.createAccounts(rec));
     }
 
 
@@ -126,8 +143,8 @@ export default class AccountDisplay extends LightningElement {
             case 'delete':
                 this.deleteRow(row);
                 break;
-            case 'show_details':
-                this.showRowDetails(row);
+            case 'edit':
+                this.editRow(row);
                 break;
             default:
         }
@@ -141,6 +158,12 @@ export default class AccountDisplay extends LightningElement {
                 .slice(0, index)
                 .concat(this.accounts.slice(index + 1));
         }
+    }
+
+    editRow(row) {
+        console.log('row',row);
+        console.log('stringify',JSON.stringify(row));
+        //fireEvent(this.pageRef, 'dataSubmit', JSON.stringify(event.detail.fields));
     }
 
     findRowIndexById(id) {

@@ -4,7 +4,7 @@ public with sharing class AccountController {
         return [
             SELECT Id, Name, Type, Industry
             FROM Account
-            LIMIT 10
+            Order By CreatedDate DESC LIMIT 10
         ];
     }
 }
