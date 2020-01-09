@@ -1,15 +1,13 @@
 import { LightningElement, track, wire } from 'lwc';
-import getAccountList from '@salesforce/apex/AccountController.getAccountList';
 import { CurrentPageReference } from 'lightning/navigation';
-//import findContacts from '@salesforce/apex/ContactController.findContacts';
 import { registerListener, unregisterAllListeners, fireEvent } from 'c/pubsub';
-
 import { createRecord } from 'lightning/uiRecordApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import getAccountList from '@salesforce/apex/AccountController.getAccountList';
 import ACCOUNT_OBJECT from '@salesforce/schema/Account';
 import NAME_FIELD from '@salesforce/schema/Account.Name';
 import TYPE_FIELD from '@salesforce/schema/Account.Type';
 import INDUSTRY_FIELD from '@salesforce/schema/Account.Industry';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { reduceErrors, uuidv4 } from './utils';
 
 const actions = [
@@ -29,18 +27,13 @@ const columns = [
 ];
 
 export default class AccountDisplay extends LightningElement {
+
     @track accounts = [];
     @track columns = columns;
-    @track record = {};
-    @track x=[];
-
-
-    accountRecords = []; 
-    name = ''
-    type = ''
-    industry = ''
     @track accountId;
 
+    selectedAccountRecords = []; 
+    
     @wire(CurrentPageReference) pageRef;
 
     @wire(getAccountList) 
@@ -58,21 +51,16 @@ export default class AccountDisplay extends LightningElement {
     }
     
     connectedCallback() {
-        //this.data = [...this.accounts.data];
         registerListener('dataSubmit', this.handleDataSubmit, this);
         //this.data = await fetchDataHelper({ amountOfRecords: 100 });
-
-       
     }
 
     disconnectedCallback() {
-        // unsubscribe from searchKeyChange event
         unregisterAllListeners(this);
     }
 
     handleDataSubmit(dataSubmit) {
         let parsedDataSubmit = JSON.parse(dataSubmit);
-        //dataSubmitWithId.Id = '123';
         let newDataSubmit = [...this.accounts];
         parsedDataSubmit.uid = uuidv4();
         newDataSubmit.unshift(parsedDataSubmit);
@@ -80,8 +68,8 @@ export default class AccountDisplay extends LightningElement {
     }
     
     handleSaveAccounts() {
-        this.accountRecords = [];
-        this.iterateOverTable();
+        this.selectedAccountRecords = [];
+        this.processSelectedAccountsForCreation();
         
     }
 
@@ -126,17 +114,16 @@ export default class AccountDisplay extends LightningElement {
             });
     }
 
-    iterateOverTable(event){       
+    processSelectedAccountsForCreation(event){       
         let table = this.template.querySelector('lightning-datatable');
         let rows = table.getSelectedRows();
         let stringifedRows = JSON.stringify(rows);
-        this.accountRecords = [...JSON.parse(stringifedRows)];
-        this.accountRecords.forEach(rec => this.createAccounts(rec));
+        this.selectedAccountRecords = [...JSON.parse(stringifedRows)];
+        this.selectedAccountRecords.forEach(rec => this.createAccounts(rec));
     }
 
 
     handleRowAction(event) {
-        
         const actionName = event.detail.action.name;
         const row = event.detail.row;
         switch (actionName) {
@@ -161,9 +148,7 @@ export default class AccountDisplay extends LightningElement {
     }
 
     editRow(row) {
-        console.log('row',row);
-        console.log('stringify',JSON.stringify(row));
-        //fireEvent(this.pageRef, 'dataSubmit', JSON.stringify(event.detail.fields));
+        fireEvent(this.pageRef, 'editData', JSON.stringify(event.detail.row));
     }
 
     findRowIndexById(id) {

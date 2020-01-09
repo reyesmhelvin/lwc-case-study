@@ -1,16 +1,28 @@
 import { LightningElement, track, wire} from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
-import { fireEvent } from 'c/pubsub';   
+import { registerListener, unregisterAllListeners, fireEvent } from 'c/pubsub';   
 
 export default class createRecordForm extends LightningElement {
    @track accountId;
+   @track recordId;
+
    @wire(CurrentPageReference) pageRef;
 
    handleSubmit(event) {
-       //event.stopPropagation();
        event.preventDefault();
        this.accountId = event.detail.id;
-       console.log(JSON.stringify(event.detail.fields));
        fireEvent(this.pageRef, 'dataSubmit', JSON.stringify(event.detail.fields));
    }
+
+    connectedCallback() {
+        registerListener('editData', this.handleEditData, this);
+    }
+
+    disconnectedCallback() {
+        unregisterAllListeners(this);
+    }
+
+    handleEditData(editData) {
+        this.recordId = editData.id;
+    }
 }

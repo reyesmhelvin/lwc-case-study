@@ -3,14 +3,14 @@
         "experimentalDecorators": true,
         "baseUrl": ".",
         "paths": {
+            "c/accountActionsAndInfo": [
+                "accountActionsAndInfo/accountActionsAndInfo.js"
+            ],
             "c/accountDisplay": [
                 "accountDisplay/accountDisplay.js"
             ],
             "c/accountForm": [
                 "accountForm/accountForm.js"
-            ],
-            "c/accountForm": [
-                "accountActionsAndInfo/accountActionsAndInfo.js"
             ]
         }
     },

@@ -9,11 +9,10 @@
                 key-field="Id"
                 data={accounts}
                 columns={columns}
-                onrowaction={handleRowAction}
-                selected-rows={x}>
+                onrowaction={handleRowAction}>
         </lightning-datatable>
     </div>
-    <c-account-actions-and-info onsaveaccounts={iterateOverTable}></c-account-actions-and-info>
+    <c-account-actions-and-info onsaveaccounts={processSelectedAccountsForCreation}></c-account-actions-and-info>
     </lightning-card>
 </template>
     
