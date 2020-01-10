@@ -32,6 +32,7 @@ export default class AccountDisplay extends LightningElement {
     @track columns = columns;
     @track accountId;
 
+    recordTypeId = ''
     selectedAccountRecords = []; 
     
     @wire(CurrentPageReference) pageRef;
@@ -52,7 +53,9 @@ export default class AccountDisplay extends LightningElement {
     
     connectedCallback() {
         registerListener('dataSubmit', this.handleDataSubmit, this);
+        registerListener('dataEdit', this.handleDataEdit, this);
         //this.data = await fetchDataHelper({ amountOfRecords: 100 });
+        console.log('recordTypeId',this.recordTypeId);
     }
 
     disconnectedCallback() {
@@ -60,11 +63,31 @@ export default class AccountDisplay extends LightningElement {
     }
 
     handleDataSubmit(dataSubmit) {
+        console.log('insert mode');
         let parsedDataSubmit = JSON.parse(dataSubmit);
         let newDataSubmit = [...this.accounts];
         parsedDataSubmit.uid = uuidv4();
         newDataSubmit.unshift(parsedDataSubmit);
         this.accounts = [...newDataSubmit];
+    }
+
+    handleDataEdit(payload) {
+        let index = 0;
+        let modifiedAccounts = [...this.accounts];
+        console.log('current accounts',JSON.stringify(modifiedAccounts));
+        let modifiedAccount = modifiedAccounts.find((account, idx) => {
+            index = idx;
+            return account.Id == payload.Id;
+        })
+        console.log('found',modifiedAccount);
+        let modifiedRecord = JSON.parse(JSON.stringify(modifiedAccount))
+        modifiedRecord.Name = payload.Name;
+        modifiedRecord.Type = payload.Type;
+        modifiedRecord.Industry = payload.Industry;
+        console.log('edited ver',modifiedRecord);
+        let mor = modifiedAccounts.splice(index,1,modifiedRecord);
+        console.log('mor',JSON.stringify(modifiedAccounts));
+        this.accounts = [...modifiedAccounts];
     }
     
     handleSaveAccounts() {
@@ -131,7 +154,8 @@ export default class AccountDisplay extends LightningElement {
                 this.deleteRow(row);
                 break;
             case 'edit':
-                this.editRow(row);
+                //this.editRow(row);
+                this.editRow(event)
                 break;
             default:
         }
@@ -147,7 +171,7 @@ export default class AccountDisplay extends LightningElement {
         }
     }
 
-    editRow(row) {
+    editRow(event) {
         fireEvent(this.pageRef, 'editData', JSON.stringify(event.detail.row));
     }
 

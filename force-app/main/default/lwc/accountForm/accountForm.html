@@ -7,11 +7,14 @@
             <lightning-record-edit-form object-api-name="Account" record-id={recordId} onsubmit={handleSubmit}>
                 <lightning-messages>
                 </lightning-messages>
+                <template if:true={isEditMode}>
+                    <div>Go to Account: <a href='google.com'>{recordId}</a></div>
+                </template>
                 <lightning-input-field field-name="Name">
                 </lightning-input-field>
-                <lightning-input-field field-name="Type">
+                <lightning-input-field field-name="Type" value={type}>
                 </lightning-input-field>
-                <lightning-input-field field-name="Industry">
+                <lightning-input-field field-name="Industry" value={industry}>
                 </lightning-input-field>
                     <lightning-button
                         class="slds-m-top_small"
@@ -24,7 +27,6 @@
                         type="submit"
                         label="Clear Form">
                     </lightning-button>
-                   
             </lightning-record-edit-form>
         </div>
     </lightning-card>
