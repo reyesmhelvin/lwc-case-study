@@ -46,8 +46,6 @@ export default class AccountDisplay extends LightningElement {
     }) {
         if (data) {
             this.accounts = [...data];
-            //console.log(data);
-            //console.log(JSON.stringify(data, null, '\t'));
         } else if (error) {
             this.error = error;
         }
@@ -56,8 +54,6 @@ export default class AccountDisplay extends LightningElement {
     connectedCallback() {
         registerListener('dataSubmit', this.handleDataSubmit, this);
         registerListener('dataEdit', this.handleDataEdit, this);
-        //this.data = await fetchDataHelper({ amountOfRecords: 100 });
-        console.log('recordTypeId',this.recordTypeId);
     }
 
     disconnectedCallback() {
@@ -65,7 +61,6 @@ export default class AccountDisplay extends LightningElement {
     }
 
     handleDataSubmit(dataSubmit) {
-        console.log('insert mode');
         let parsedDataSubmit = JSON.parse(dataSubmit);
         let newDataSubmit = [...this.accounts];
         parsedDataSubmit.uid = uuidv4();
@@ -91,10 +86,7 @@ export default class AccountDisplay extends LightningElement {
     }
 
     //this could be refactored
-    updateNewlyCreatedRecordId(payload, recordId) {
-        console.log('updateNewlyCreatedRecordId-payload',payload);
-        console.log('updateNewlyCreatedRecordId-recordId',recordId);
-        
+    updateNewlyCreatedRecordId(payload, recordId) {       
         let index = 0;
         let modifiedAccounts = [...this.accounts];
         let modifiedAccount = modifiedAccounts.find((account, idx) => {
@@ -109,11 +101,9 @@ export default class AccountDisplay extends LightningElement {
     
     handleSaveAccounts() {
         if (this.isEditMode) {
-            console.log('UPDATE');
             this.selectedAccountRecords = [];
             this.processSelectedAccountsForUpdate();
         } else {
-            console.log('CREATE');
             this.selectedAccountRecords = [];
             this.processSelectedAccountsForCreation();
         }
@@ -122,16 +112,13 @@ export default class AccountDisplay extends LightningElement {
 
     addUrlToAccountRecord(uid) {
         return this.accounts.map((e) => {
-            console.log('e',e.uid);
             if (e.uid === uid) {
                 e.id = this.accountId;
-                console.log(e.id);
             };
         });
     }
 
     createAccounts(record) {
-        console.log('createAccounts');
         const fields = {};
         fields[NAME_FIELD.fieldApiName] = record.Name;
         fields[TYPE_FIELD.fieldApiName] = record.Type;
@@ -164,7 +151,6 @@ export default class AccountDisplay extends LightningElement {
     }
 
     updateAccounts(record) {
-        console.log('updateAccounts');
         const fields = {};
         fields[ID_FIELD.fieldApiName] = record.Id;
         fields[NAME_FIELD.fieldApiName] = record.Name;
@@ -221,13 +207,11 @@ export default class AccountDisplay extends LightningElement {
         const actionName = event.detail.action.name;
         const row = event.detail.row;
 
-        
         switch (actionName) {
             case 'delete':
                 this.deleteRow(row);
                 break;
             case 'edit':
-                //this.editRow(row);
                 this.editRow(event)
                 break;
             default:
@@ -259,10 +243,5 @@ export default class AccountDisplay extends LightningElement {
         });
         return ret;
     }
-
-    showRowDetails(row) {
-        this.record = row;
-    }
-
     
 }

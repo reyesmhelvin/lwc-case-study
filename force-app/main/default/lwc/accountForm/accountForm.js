@@ -51,7 +51,6 @@ export default class createRecordForm extends LightningElement {
         if (inputFields) {
             inputFields.forEach(field => {
                 field.reset();
-                console.log(field);
             });
         }
         this.isEditMode = false;
