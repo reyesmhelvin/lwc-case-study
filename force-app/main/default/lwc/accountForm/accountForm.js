@@ -6,6 +6,7 @@ export default class createRecordForm extends LightningElement {
    @track accountId;
    @track recordId;
    @track type;
+   @track name;
    @track industry;
 
    @track isEditMode = false;
@@ -23,6 +24,7 @@ export default class createRecordForm extends LightningElement {
        } else {
         fireEvent(this.pageRef, 'dataSubmit', JSON.stringify(event.detail.fields));
        }
+       this.handleReset();
    }
 
     connectedCallback() {
@@ -36,8 +38,26 @@ export default class createRecordForm extends LightningElement {
     handleEditData(editData) {
         let data = JSON.parse(editData);
         this.recordId = data.Id;
+        this.name = data.Name;
         this.type = data.Type;
         this.industry = data.Industry;
         this.isEditMode = true;
     }
+
+    handleReset(event) {
+        const inputFields = this.template.querySelectorAll(
+            'lightning-input-field'
+        );
+        if (inputFields) {
+            inputFields.forEach(field => {
+                field.reset();
+                console.log(field);
+            });
+        }
+        this.isEditMode = false;
+        this.name = '';
+        this.industry = '';
+        this.type = '';
+     }
+     
 }

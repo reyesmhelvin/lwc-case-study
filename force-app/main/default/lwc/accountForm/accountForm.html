@@ -8,9 +8,9 @@
                 <lightning-messages>
                 </lightning-messages>
                 <template if:true={isEditMode}>
-                    <div>Go to Account: <a href='google.com'>{recordId}</a></div>
+                    <div>Go to Account: <a href="">{recordId}</a></div>
                 </template>
-                <lightning-input-field field-name="Name">
+                <lightning-input-field field-name="Name" value={name}>
                 </lightning-input-field>
                 <lightning-input-field field-name="Type" value={type}>
                 </lightning-input-field>
@@ -24,7 +24,7 @@
                     </lightning-button>
                     <lightning-button
                         class="slds-m-top_small"
-                        type="submit"
+                        onclick={handleReset}
                         label="Clear Form">
                     </lightning-button>
             </lightning-record-edit-form>

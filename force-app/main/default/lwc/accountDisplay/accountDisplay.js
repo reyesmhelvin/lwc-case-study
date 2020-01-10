@@ -73,6 +73,7 @@ export default class AccountDisplay extends LightningElement {
         this.accounts = [...newDataSubmit];
     }
 
+    //this could be refactored
     handleDataEdit(payload) {
         let index = 0;
         let modifiedAccounts = [...this.accounts];
@@ -87,6 +88,23 @@ export default class AccountDisplay extends LightningElement {
         modifiedAccounts.splice(index,1,modifiedRecord);
         this.accounts = [...modifiedAccounts];
         this.isEditMode = true;
+    }
+
+    //this could be refactored
+    updateNewlyCreatedRecordId(payload, recordId) {
+        console.log('updateNewlyCreatedRecordId-payload',payload);
+        console.log('updateNewlyCreatedRecordId-recordId',recordId);
+        
+        let index = 0;
+        let modifiedAccounts = [...this.accounts];
+        let modifiedAccount = modifiedAccounts.find((account, idx) => {
+            index = idx;
+            return account.uid == payload.uid;
+        })
+        let modifiedRecord = JSON.parse(JSON.stringify(modifiedAccount))
+        modifiedRecord.Id = recordId;
+        modifiedAccounts.splice(index,1,modifiedRecord);
+        this.accounts = [...modifiedAccounts];
     }
     
     handleSaveAccounts() {
@@ -119,7 +137,7 @@ export default class AccountDisplay extends LightningElement {
         fields[TYPE_FIELD.fieldApiName] = record.Type;
         fields[INDUSTRY_FIELD.fieldApiName] = record.Industry;
 
-        const recordInput = { fields, clientOptions: ACCOUNT_OBJECT.objectApiName };
+        const recordInput = { fields, apiName: ACCOUNT_OBJECT.objectApiName };
 
         createRecord(recordInput)
             .then(account => {
@@ -131,6 +149,7 @@ export default class AccountDisplay extends LightningElement {
                         variant: 'success'
                     })
                 );
+                this.updateNewlyCreatedRecordId(record, account.id);
                 
             })
             .catch(error => {
@@ -198,8 +217,11 @@ export default class AccountDisplay extends LightningElement {
 
 
     handleRowAction(event) {
+
         const actionName = event.detail.action.name;
         const row = event.detail.row;
+
+        
         switch (actionName) {
             case 'delete':
                 this.deleteRow(row);
@@ -241,4 +263,6 @@ export default class AccountDisplay extends LightningElement {
     showRowDetails(row) {
         this.record = row;
     }
+
+    
 }
