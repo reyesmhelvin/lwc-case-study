@@ -14,14 +14,11 @@ export default class createRecordForm extends LightningElement {
 
    handleSubmit(event) {
        event.preventDefault();
-       console.log(this.isEditMode);
        this.accountId = event.detail.id;
        if (this.isEditMode) {
         let parsedData = JSON.stringify(event.detail.fields);
         let stringifiedData = JSON.parse(parsedData);
-        console.log('modifiedData',stringifiedData);
         stringifiedData.Id = this.recordId
-        console.log('modifiedData id',stringifiedData);
         fireEvent(this.pageRef, 'dataEdit', stringifiedData);
        } else {
         fireEvent(this.pageRef, 'dataSubmit', JSON.stringify(event.detail.fields));
@@ -30,7 +27,6 @@ export default class createRecordForm extends LightningElement {
 
     connectedCallback() {
         registerListener('editData', this.handleEditData, this);
-        console.log('this.recordTypeId',this.recordTypeId);
     }
 
     disconnectedCallback() {

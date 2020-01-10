@@ -1,0 +1,83 @@
+warning: LF will be replaced by CRLF in force-app/main/default/lwc/accountDisplay/accountDisplay.js.
+The file will have its original line endings in your working directory
+warning: LF will be replaced by CRLF in force-app/main/default/lwc/jsconfig.json.
+The file will have its original line endings in your working directory
+[1mdiff --git a/force-app/main/default/lwc/accountDisplay/accountDisplay.js b/force-app/main/default/lwc/accountDisplay/accountDisplay.js[m
+[1mindex 481037c..f21665f 100644[m
+[1m--- a/force-app/main/default/lwc/accountDisplay/accountDisplay.js[m
+[1m+++ b/force-app/main/default/lwc/accountDisplay/accountDisplay.js[m
+[36m@@ -1,7 +1,7 @@[m
+ import { LightningElement, track, wire } from 'lwc';[m
+ import { CurrentPageReference } from 'lightning/navigation';[m
+ import { registerListener, unregisterAllListeners, fireEvent } from 'c/pubsub';[m
+[31m-import { createRecord } from 'lightning/uiRecordApi';[m
+[32m+[m[32mimport { createRecord, updateRecord } from 'lightning/uiRecordApi';[m
+ import { ShowToastEvent } from 'lightning/platformShowToastEvent';[m
+ import getAccountList from '@salesforce/apex/AccountController.getAccountList';[m
+ import ACCOUNT_OBJECT from '@salesforce/schema/Account';[m
+[36m@@ -74,26 +74,21 @@[m [mexport default class AccountDisplay extends LightningElement {[m
+     handleDataEdit(payload) {[m
+         let index = 0;[m
+         let modifiedAccounts = [...this.accounts];[m
+[31m-        console.log('current accounts',JSON.stringify(modifiedAccounts));[m
+         let modifiedAccount = modifiedAccounts.find((account, idx) => {[m
+             index = idx;[m
+             return account.Id == payload.Id;[m
+         })[m
+[31m-        console.log('found',modifiedAccount);[m
+         let modifiedRecord = JSON.parse(JSON.stringify(modifiedAccount))[m
+         modifiedRecord.Name = payload.Name;[m
+         modifiedRecord.Type = payload.Type;[m
+         modifiedRecord.Industry = payload.Industry;[m
+[31m-        console.log('edited ver',modifiedRecord);[m
+[31m-        let mor = modifiedAccounts.splice(index,1,modifiedRecord);[m
+[31m-        console.log('mor',JSON.stringify(modifiedAccounts));[m
+[32m+[m[32m        modifiedAccounts.splice(index,1,modifiedRecord);[m
+         this.accounts = [...modifiedAccounts];[m
+     }[m
+     [m
+     handleSaveAccounts() {[m
+         this.selectedAccountRecords = [];[m
+         this.processSelectedAccountsForCreation();[m
+[31m-        [m
+     }[m
+ [m
+     addUrlToAccountRecord(uid) {[m
+[36m@@ -137,6 +132,37 @@[m [mexport default class AccountDisplay extends LightningElement {[m
+             });[m
+     }[m
+ [m
+[32m+[m[32m    updateAccounts(record) {[m
+[32m+[m[32m        const fields = {};[m
+[32m+[m[32m        fields[NAME_FIELD.fieldApiName] = record.Name;[m
+[32m+[m[32m        fields[TYPE_FIELD.fieldApiName] = record.Type;[m
+[32m+[m[32m        fields[INDUSTRY_FIELD.fieldApiName] = record.Industry;[m
+[32m+[m
+[32m+[m[32m        const recordInput = { apiName: ACCOUNT_OBJECT.objectApiName, fields };[m
+[32m+[m
+[32m+[m[32m        updateRecord(recordInput)[m
+[32m+[m[32m            .then(account => {[m
+[32m+[m[32m                this.accountId = account.id;[m
+[32m+[m[32m                this.dispatchEvent([m
+[32m+[m[32m                    new ShowToastEvent({[m
+[32m+[m[32m                        title: 'Success',[m
+[32m+[m[32m                        message: 'Account created',[m
+[32m+[m[32m                        variant: 'success'[m
+[32m+[m[32m                    })[m
+[32m+[m[32m                );[m
+[32m+[m[41m                [m
+[32m+[m[32m            })[m
+[32m+[m[32m            .catch(error => {[m
+[32m+[m[32m                this.dispatchEvent([m
+[32m+[m[32m                    new ShowToastEvent({[m
+[32m+[m[32m                        title: 'Error creating record',[m
+[32m+[m[32m                        message: reduceErrors(error).join(', '),[m
+[32m+[m[32m                        variant: 'error'[m
+[32m+[m[32m                    })[m
+[32m+[m[32m                );[m
+[32m+[m[32m            });[m
+[32m+[m[32m    }[m
+[32m+[m
+     processSelectedAccountsForCreation(event){       [m
+         let table = this.template.querySelector('lightning-datatable');[m
+         let rows = table.getSelectedRows();[m
